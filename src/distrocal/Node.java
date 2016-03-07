@@ -26,6 +26,7 @@ public class Node implements Serializable {
     Constructor
     */
     public Node(String _ip, int _port) {
+        
         this.ip = _ip;
         this.port = _port;
         
@@ -37,6 +38,7 @@ public class Node implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
     }
     
     /*
@@ -46,7 +48,7 @@ public class Node implements Serializable {
         ObjectOutputStream oos = new ObjectOutputStream(outStream);
         oos.writeObject(m);
     }
-    
+
     /*
     Predicate to determine if this Node has knowledge of an Event
     */

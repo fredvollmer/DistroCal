@@ -5,10 +5,12 @@
  */
 package distrocal;
 
+import com.sun.net.httpserver.HttpServer;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.*;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,73 +19,70 @@ import java.util.logging.Logger;
  *
  * @author fredvollmer
  */
-public class DistroCal extends Thread {
+public class DistroCal {
+
+    private static DistroCal instance;
+    public boolean isCrashed = false;
 
     private ServerSocket serverSocket;
-    private int listeningPort = 3000;
-    
+    private int socketPort = 3000;
+    private int httpPort = 80;
+
+    Thread socketThread;
+    Thread httpThread;
+
     private Set<Node> nodes;
 
     /*
      Constructor
      Instantiates server socket
      */
-    public DistroCal(int ID, String[] IPs, int port) throws IOException {
-        listeningPort = port;
-        
-        serverSocket = new ServerSocket(listeningPort);
+    public DistroCal(String[] IPs, int port) throws IOException {
+        socketPort = port;
+
         serverSocket.setSoTimeout(10000);
-        System.out.println("DistroCal node started...");
-        
+
         // Create "this" node
-        
         // Create remote Nodes
         for (String ip : IPs) {
-             nodes.add(new Node(ip, listeningPort));
+            nodes.add(new Node(ip, socketPort));
         }
+
+        // Start listener threads
+        socketThread = new SocketThread(socketPort);
+        socketThread.start();
+
+        HttpServer server = HttpServer.create(new InetSocketAddress(httpPort), 200);
+        server.createContext("/", new RequestHandler());
+        server.setExecutor(null); // creates a default executor
+        server.start();
+
+        System.out.println("DistroCal node started...");
     }
 
-    /*
-     Run thread
+    /**
+     * @param args the command line arguments
      */
-    @Override
-    public void run() {
-        while (true) {
-            try {
-                System.out.println("Listening for message on port "
-                        + serverSocket.getLocalPort());
-                // Create socket upon connection
-                Socket server = serverSocket.accept();
-                System.out.println("Socket connection received from "
-                        + server.getRemoteSocketAddress());
-
-                // Receive message
-                DataInputStream in = new DataInputStream(server.getInputStream());
-                ObjectInputStream messageObject = new ObjectInputStream(in);
-                Message m = (Message) messageObject.readObject();
-            } catch (IOException ex) {
-                System.err.println("An error ocurred receiving remote message: ");
-                ex.printStackTrace();
-            } catch (ClassNotFoundException ex) {
-                System.err.println("An error ocurred while parsing message "
-                        + "into object.");
-                ex.printStackTrace();
-            }
-        }
-    }
-        /**
-         * @param args the command line arguments
-         */
     public static void main(String[] args) {
         /*
         Parse arguments
         [0]     --> Port to connect to remote Nodes with and listen on
         [1...n] --> IP addresses of remote Nodes
-        */
-        
-        // Create "this" Node
-        
-        
+         */
+
+        // Create DistroCal
+        String[] IPs = Arrays.copyOfRange(args, 1, args.length);
+        try {
+            instance = new DistroCal(IPs, Integer.parseInt(args[0]));
+            System.out.println("DistroCal initialized");
+        } catch (IOException ex) {
+            Logger.getLogger(DistroCal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public static DistroCal getInstance() {
+        return DistroCal.instance;
     }
 
 }

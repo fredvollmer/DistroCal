@@ -28,8 +28,7 @@ public class TimeMatrix implements Serializable {
         }
     }
     
-    public int get(Node i, Node j) {
-        // First get node i's map
+    public void updateWithMatrix(TimeMatrix m) {
         
     }
 }

@@ -9,6 +9,7 @@ import com.sun.net.httpserver.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  *
@@ -17,6 +18,29 @@ import java.io.OutputStream;
 public class RequestHandler implements HttpHandler {
     
       public void handle(HttpExchange t) throws IOException {
+          switch (t.getRequestMethod()) {
+              case "GET":
+                  // Return data package
+                  break;
+              case "POST":
+                  // Create new event
+                  break;
+              case "DELETE":
+                  // Crash this node
+                  break;
+              case "OPTIONS":
+                  // Handle CORS preflight
+                  // Get origin
+                  Headers requestHeaders = t.getRequestHeaders();
+                  String origin = requestHeaders.get("Origin").get(0);
+                  Headers responseHeaders = t.getResponseHeaders();
+                  List<String> allowedMethods = new LinkedList<>();
+                  
+                  // Send headers
+                  responseHeaders.set("Access-Control-Allow-Origin", origin);
+                  responseHeaders.set("Access-Control-Allow-Methods", origin);
+                  
+          }
             InputStream is = t.getRequestBody();
            read(is); // .. read the request body
            String response = "This is the response";

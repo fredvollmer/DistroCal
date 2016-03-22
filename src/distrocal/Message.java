@@ -13,7 +13,6 @@ import java.io.Serializable;
  */
 public class Message implements Serializable {
 
-    private MessageType type;
     private Log partialLog;
     private TimeMatrix timeMatrix;
 
@@ -21,25 +20,7 @@ public class Message implements Serializable {
           // Do nothing if this node is "crashed"
           if (DistroCal.getInstance().isCrashed) return;
           
-          switch (m.type) {
-              case CRASH:
-                  // "Crash" this node
-                  DistroCal.getInstance().isCrashed = true;
-                  break;
-              case REVIVE:
-                  DistroCal.getInstance().isCrashed = false;
-                  break;
-              case UPDATE:
-                  // Update time matrix
-                  
-                  // Update log
-                  
-                  break;
-                  
-              case RETRIEVE:
-                  // Send JSON package to client
-                  
-                  break;
+          // Update TimeMatrix based on received
+          DistroCal.getInstance().getTimeMatrix().updateWithMatrix(m.timeMatrix);
           }
     }
-}

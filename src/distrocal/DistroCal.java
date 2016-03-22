@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.*;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,12 +27,14 @@ public class DistroCal {
 
     private ServerSocket serverSocket;
     private int socketPort = 3000;
-    private int httpPort = 80;
+    private int httpPort = 1024;
 
     Thread socketThread;
-    Thread httpThread;
 
-    private Set<Node> nodes;
+    private Set<Node> otherNodes;
+    private Node thisNode;
+    private TimeMatrix timeMatrix;
+    public int logicalClock = 0;
 
     /*
      Constructor
@@ -39,14 +42,15 @@ public class DistroCal {
      */
     public DistroCal(String[] IPs, int port) throws IOException {
         socketPort = port;
-
-        serverSocket.setSoTimeout(10000);
+        otherNodes = new HashSet<> ();
 
         // Create "this" node
         // Create remote Nodes
         for (String ip : IPs) {
-            nodes.add(new Node(ip, socketPort));
+            otherNodes.add(new Node(ip, socketPort));
         }
+        
+        // Create 2D time table
 
         // Start listener threads
         socketThread = new SocketThread(socketPort);
@@ -74,7 +78,6 @@ public class DistroCal {
         String[] IPs = Arrays.copyOfRange(args, 1, args.length);
         try {
             instance = new DistroCal(IPs, Integer.parseInt(args[0]));
-            System.out.println("DistroCal initialized");
         } catch (IOException ex) {
             Logger.getLogger(DistroCal.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -83,6 +86,10 @@ public class DistroCal {
 
     public static DistroCal getInstance() {
         return DistroCal.instance;
+    }
+    
+    public TimeMatrix getTimeMatrix() {
+        return timeMatrix;
     }
 
 }

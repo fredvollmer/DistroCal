@@ -23,37 +23,42 @@ public class Node implements Serializable {
     private ObjectOutputStream outStream;
 
     /*
-    Constructor
-    */
+     Constructor
+     */
     public Node(String _ip, int _port) {
-        
+
         this.ip = _ip;
         this.port = _port;
-        
+
+    }
+
+    /*
+     Send a Message object to this Node
+     */
+    public void send(Message m) throws IOException {
         // Create socket connection for this Node
         try {
             this.socket = new Socket(ip, port);
             DataOutputStream ds = new DataOutputStream(socket.getOutputStream());
-            this.outStream = new ObjectOutputStream(outStream);
+            this.outStream = new ObjectOutputStream(ds);
+
+            outStream.writeObject(m);
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-    }
-    
-    /*
-    Send a Message object to this Node
-    */
-    public void send (Message m) throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(outStream);
-        oos.writeObject(m);
+
     }
 
     /*
-    Predicate to determine if this Node has knowledge of an Event
-    */
-    public boolean hasRec (Event e, TimeMatrix t) {
+     Predicate to determine if this Node has knowledge of an Event
+     */
+    public boolean hasRec(Event e, TimeMatrix t) {
         return t.get(this, e.getNode()) >= e.getTime();
     }
     
+    public String getIP() {
+        return this.ip;
+    }
+
 }

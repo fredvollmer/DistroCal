@@ -29,6 +29,7 @@ public class TimeMatrix implements Serializable {
     }
     
     public void updateWithMatrix(TimeMatrix m) {
-        
+        // First, we update this node's matrix with values from the received matrix
+        // 
     }
 }

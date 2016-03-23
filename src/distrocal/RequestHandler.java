@@ -12,21 +12,29 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import static javax.imageio.ImageIO.read;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 /**
  *
  * @author anniefischer
  */
 public class RequestHandler implements HttpHandler {
-    
+    // Create Jackson instance
+     ObjectMapper jsonMapper = new ObjectMapper();
+     
       public void handle(HttpExchange t) throws IOException {
           InputStream is = t.getRequestBody();
           read(is); // .. read the request body
           String response = "";
-          String origin = "";
+          Headers requestHeaders = t.getRequestHeaders();
+          String origin = requestHeaders.get("Origin").get(0);
+          
           switch (t.getRequestMethod()) {
               case "GET":
-                  // Return data package
+                  // Return data package: events and instance status
+                  DataPackage p = new DataPackage();
+                  p.events = DistroCal.getInstance().
                   break;
               case "POST":
                   // Create new event
@@ -36,9 +44,6 @@ public class RequestHandler implements HttpHandler {
                   break;
               case "OPTIONS":
                   // Handle CORS preflight
-                  // Get origin
-                  Headers requestHeaders = t.getRequestHeaders();
-                  origin = requestHeaders.get("Origin").get(0);
                   Headers responseHeaders = t.getResponseHeaders();
                   List<String> allowedMethods = new LinkedList<>();
                   allowedMethods.add("POST");

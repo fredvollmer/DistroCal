@@ -25,7 +25,7 @@ public class Node implements Serializable {
     /*
      Constructor
      */
-    public Node(String _address, int _port) {
+    public Node(String _address) {
 
         String addressParts[] = _address.split(":");
         this.ip = addressParts[0];
@@ -63,5 +63,12 @@ public class Node implements Serializable {
     */
     public String getAddress() {
         return this.ip + ":" + this.port;
+    }
+    
+    /*
+    Return the listener port for this node
+    */
+    public int getPort() {
+        return this.port;
     }
 }

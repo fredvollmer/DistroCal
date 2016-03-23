@@ -42,19 +42,26 @@ public class DistroCal {
         otherNodes = new HashSet<> ();
 
         // Create "this" node
-        thisNode = new Node(thisIP, socketPort);
+        thisNode = new Node(thisIP);
         
         // Create remote Nodes
         for (String ip : IPs) {
-            otherNodes.add(new Node(ip, socketPort));
+            otherNodes.add(new Node(ip));
         }
         
         // Create 2D time table
+        // Build set of ALL nodes (includes this node)
+        Set<Node> allNodes = new HashSet<> ();
+        allNodes.addAll(DistroCal.getInstance().getOtherNodes());
+        allNodes.add(DistroCal.getInstance().getThisNode());
+        
+        timeMatrix = new TimeMatrix(allNodes);
 
-        // Start listener threads
-        socketThread = new SocketThread(socketPort);
+        // Start listener thread
+        socketThread = new SocketThread(thisNode.getPort());
         socketThread.start();
 
+        // start HTTP server
         HttpServer server = HttpServer.create(new InetSocketAddress(httpPort), 200);
         server.createContext("/", new RequestHandler());
         server.setExecutor(null); // creates a default executor
@@ -94,5 +101,12 @@ public class DistroCal {
     public Set<Node> getOtherNodes() {
         return otherNodes;
     }
-
+    
+    public Node getThisNode() {
+        return thisNode;
+    }
+    
+    public Set<Event> getEvents () {
+        return events;
+    }
 }

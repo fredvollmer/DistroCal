@@ -26,22 +26,19 @@ public class DistroCal {
     public boolean isCrashed = false;
 
     private ServerSocket serverSocket;
-    private int socketPort = 3000;
-    private int httpPort = 1024;
+    private final int httpPort = 1024;
 
     Thread socketThread;
 
     private Set<Node> otherNodes;
     private Node thisNode;
     private TimeMatrix timeMatrix;
-    public int logicalClock = 0;
 
     /*
      Constructor
      Instantiates server socket
      */
-    public DistroCal(String[] IPs, String thisIP, int port) throws IOException {
-        socketPort = port;
+    public DistroCal(String[] IPs, String thisIP) throws IOException {
         otherNodes = new HashSet<> ();
 
         // Create "this" node
@@ -72,15 +69,14 @@ public class DistroCal {
     public static void main(String[] args) {
         /*
         Parse arguments
-        [0]     --> Port to connect to remote Nodes with and listen on
-        [1]     --> IP address of THIS node
-        [2...n] --> IP addresses of remote Nodes
+        [0]     --> [IP]:[Port] of THIS node
+        [1...n] --> [IP]:[Port] of remote Nodes
          */
 
         // Create DistroCal
-        String[] IPs = Arrays.copyOfRange(args, 2, args.length);
+        String[] IPs = Arrays.copyOfRange(args, 1, args.length);
         try {
-            instance = new DistroCal(IPs, args[1], Integer.parseInt(args[0]));
+            instance = new DistroCal(IPs, args[0]);
         } catch (IOException ex) {
             Logger.getLogger(DistroCal.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -95,7 +91,7 @@ public class DistroCal {
         return timeMatrix;
     }
     
-    public Set<Node> getNodes() {
+    public Set<Node> getOtherNodes() {
         return otherNodes;
     }
 

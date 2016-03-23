@@ -25,10 +25,11 @@ public class Node implements Serializable {
     /*
      Constructor
      */
-    public Node(String _ip, int _port) {
+    public Node(String _address, int _port) {
 
-        this.ip = _ip;
-        this.port = _port;
+        String addressParts[] = _address.split(":");
+        this.ip = addressParts[0];
+        this.port = Integer.parseInt(addressParts[1]);
 
     }
 
@@ -57,8 +58,10 @@ public class Node implements Serializable {
         return t.get(this, e.getNode()) >= e.getTime();
     }
     
-    public String getIP() {
-        return this.ip;
+    /*
+    Returns a stirng in the format [ip]:[port] used as a key in the time matrix
+    */
+    public String getAddress() {
+        return this.ip + ":" + this.port;
     }
-
 }

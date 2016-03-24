@@ -24,7 +24,7 @@ public class TimeMatrix implements Serializable {
         for (Node i : nodes) {
             table.put(i.getAddress(), new HashMap<>());
             for (Node j : nodes) {
-                table.get(i).put(j.getAddress(), 0);
+                table.get(i.getAddress()).put(j.getAddress(), 0);
             }
         }
     }
@@ -35,6 +35,15 @@ public class TimeMatrix implements Serializable {
     
     public void set(Node row, Node col, int t) {
         table.get(row.getAddress()).put(col.getAddress(), t);
+    }
+    
+    /*
+    Increment this node's logical clock
+    */
+    public void incrementClock () {
+        Node me = DistroCal.getInstance().getThisNode();
+        int t = get(me, me);
+        set(me, me, ++t);
     }
     
     public void updateWithMatrix(TimeMatrix m) {

@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// NOTE: Access this DistroCal instance via DistroCal.getInstance()
+
 /**
  *
  * @author fredvollmer
@@ -26,11 +28,13 @@ public class DistroCal {
     public boolean isCrashed = false;
 
     private ServerSocket serverSocket;
-    private final int httpPort = 1024;
+    private final int httpPort = 8000;
 
     Thread socketThread;
 
     private Set<Node> otherNodes;
+    private Log partialLog;
+    private Set<CalendarEvent> calendar;
     private Node thisNode;
     private TimeMatrix timeMatrix;
 
@@ -52,8 +56,8 @@ public class DistroCal {
         // Create 2D time table
         // Build set of ALL nodes (includes this node)
         Set<Node> allNodes = new HashSet<> ();
-        allNodes.addAll(DistroCal.getInstance().getOtherNodes());
-        allNodes.add(DistroCal.getInstance().getThisNode());
+        allNodes.addAll(otherNodes);
+        allNodes.add(thisNode);
         
         timeMatrix = new TimeMatrix(allNodes);
 
@@ -89,6 +93,20 @@ public class DistroCal {
         }
 
     }
+    
+    /*
+    Imitate node failure
+    */
+    public static void crash() {
+        instance.isCrashed = true;
+    }
+    
+    /*
+    Imitate node recovery
+    */
+    public static void recover() {
+        instance.isCrashed = false;
+    }
 
     public static DistroCal getInstance() {
         return DistroCal.instance;
@@ -106,7 +124,7 @@ public class DistroCal {
         return thisNode;
     }
     
-    public Set<Event> getEvents () {
-        return events;
+    public Set<CalendarEvent> getCalendarEvents () {
+        return calendar;
     }
 }

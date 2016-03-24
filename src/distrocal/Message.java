@@ -20,7 +20,10 @@ public class Message implements Serializable {
           // Do nothing if this node is "crashed"
           if (DistroCal.getInstance().isCrashed) return;
           
-          // Update TimeMatrix based on received
+          // Increment clock
+          DistroCal.getInstance().getTimeMatrix().incrementClock();
+          
+          // Update TimeMatrix based on received time table
           DistroCal.getInstance().getTimeMatrix().updateWithMatrix(m.timeMatrix);
           }
     }

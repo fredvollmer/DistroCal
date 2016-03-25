@@ -23,37 +23,76 @@ public class Node implements Serializable {
     private ObjectOutputStream outStream;
 
     /*
-    Constructor
+     Constructor
+     */
+    public Node(String _address) {
+
+        String addressParts[] = _address.split(":");
+        this.ip = addressParts[0];
+        this.port = Integer.parseInt(addressParts[1]);
+
+    }
+    
+    /*
+    Create a partial log to send to this node
     */
-    public Node(String _ip, int _port) {
+    public Log createPartialLog () {
         
-        this.ip = _ip;
-        this.port = _port;
+        return new Log();
+    }
+
+    /*
+     Send a Message object to this Node
+     */
+    public void send(Message m) throws IOException {
+        // Increment clock
+        DistroCal.getInstance().getTimeMatrix().incrementClock();
         
         // Create socket connection for this Node
         try {
             this.socket = new Socket(ip, port);
             DataOutputStream ds = new DataOutputStream(socket.getOutputStream());
-            this.outStream = new ObjectOutputStream(outStream);
+            this.outStream = new ObjectOutputStream(ds);
+
+            outStream.writeObject(m);
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
     }
     
-    /*
-    Send a Message object to this Node
-    */
-    public void send (Message m) throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(outStream);
-        oos.writeObject(m);
+       /*
+     Check if this node is available over a time range
+     Start time is inclusive, end is exclusive
+     */
+    public boolean isAvailable(int day, int start, int end) {
+        // Iterate over each time slot, checking if key exists
+        for (; start < end; start++) {
+            if (DistroCal.getInstance().getCalendarEvents().containsKey(day + "-" + start + "-" + getAddress())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /*
-    Predicate to determine if this Node has knowledge of an Event
-    */
-    public boolean hasRec (Event e, TimeMatrix t) {
+     Predicate to determine if this Node has knowledge of an Event
+     */
+    public boolean hasRec(Event e, TimeMatrix t) {
         return t.get(this, e.getNode()) >= e.getTime();
     }
     
+    /*
+    Returns a stirng in the format [ip]:[port] used as a key in the time matrix
+    */
+    public String getAddress() {
+        return this.ip + ":" + this.port;
+    }
+    
+    /*
+    Return the listener port for this node
+    */
+    public int getPort() {
+        return this.port;
+    }
 }

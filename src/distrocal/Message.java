@@ -13,33 +13,37 @@ import java.io.Serializable;
  */
 public class Message implements Serializable {
 
-    private MessageType type;
     private Log partialLog;
     private TimeMatrix timeMatrix;
+    
+    /*
+    Constructor
+    */
+    public Message (Log l, TimeMatrix t) {
+        partialLog = l;
+        timeMatrix = t;
+    }
 
     public static void handleReceivedMessage(Message m) {
           // Do nothing if this node is "crashed"
           if (DistroCal.getInstance().isCrashed) return;
           
-          switch (m.type) {
-              case CRASH:
-                  // "Crash" this node
-                  DistroCal.getInstance().isCrashed = true;
-                  break;
-              case REVIVE:
-                  DistroCal.getInstance().isCrashed = false;
-                  break;
-              case UPDATE:
-                  // Update time matrix
-                  
-                  // Update log
-                  
-                  break;
-                  
-              case RETRIEVE:
-                  // Send JSON package to client
-                  
-                  break;
+          // Increment clock
+          DistroCal.getInstance().getTimeMatrix().incrementClock();
+          
+          // Remove events from partial log we already know about
+          // Must happen before time matrix is updated
+          m.partialLog.trim();
+          
+          // Integreate receieved log into our own log
+          DistroCal.getInstance().integrateReceivedLog (m.partialLog);
+          
+          // Process events in log into calendar dictionary
+          
+                    
+          // Update TimeMatrix based on received time table
+          DistroCal.getInstance().getTimeMatrix().updateWithMatrix(m.timeMatrix);
+                    
+          System.out.println("Message handled.");
           }
     }
-}

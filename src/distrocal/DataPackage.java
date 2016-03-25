@@ -14,10 +14,10 @@ import java.util.Set;
  * @author s65q479
  */
 public class DataPackage {
-    public List<CalendarEvent> events;
+    public Set<Appointment> events;
     public int status;
     
-    public List<CalendarEvent> getEvents () {
+    public Set<Appointment> getEvents () {
         return events;
     }
     

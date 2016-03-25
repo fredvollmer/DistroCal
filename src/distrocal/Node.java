@@ -68,7 +68,7 @@ public class Node implements Serializable {
     public boolean isAvailable(int day, int start, int end) {
         // Iterate over each time slot, checking if key exists
         for (; start < end; start++) {
-            if (DistroCal.getInstance().getCalendarEvents().containsKey(day + "-" + start + "-" + getAddress())) {
+            if (DistroCal.getInstance().getAppointments().containsKey(day + "-" + start + "-" + getAddress())) {
                 return false;
             }
         }

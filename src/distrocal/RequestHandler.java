@@ -14,6 +14,9 @@ import static javax.imageio.ImageIO.read;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.OutputStream;
 import java.util.List;
+import static javax.imageio.ImageIO.read;
+import static javax.imageio.ImageIO.read;
+import static javax.imageio.ImageIO.read;
 
 /**
  *
@@ -38,7 +41,7 @@ public class RequestHandler implements HttpHandler {
 
                 // Return data package: events and instance status
                 DataPackage p = new DataPackage();
-                p.events = (List<CalendarEvent>) DistroCal.getInstance().getCalendarEvents().values();
+                p.events = DistroCal.getInstance().getAppointmentsAsSet();
                 p.status = (DistroCal.getInstance().isCrashed) ? 0 : 1;
                 try {
                     response = jsonMapper.writeValueAsString(p);

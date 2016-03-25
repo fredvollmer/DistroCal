@@ -32,11 +32,22 @@ public class Node implements Serializable {
         this.port = Integer.parseInt(addressParts[1]);
 
     }
+    
+    /*
+    Create a partial log to send to this node
+    */
+    public Log createPartialLog () {
+        
+        return new Log();
+    }
 
     /*
      Send a Message object to this Node
      */
     public void send(Message m) throws IOException {
+        // Increment clock
+        DistroCal.getInstance().getTimeMatrix().incrementClock();
+        
         // Create socket connection for this Node
         try {
             this.socket = new Socket(ip, port);
@@ -48,7 +59,6 @@ public class Node implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     /*

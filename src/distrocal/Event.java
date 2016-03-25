@@ -24,4 +24,8 @@ public class Event implements Serializable {
     public int getTime() {
         return time;
     }
+    
+    public EventType getType () {
+        return type;
+    }
 }

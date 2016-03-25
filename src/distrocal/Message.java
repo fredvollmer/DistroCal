@@ -23,7 +23,19 @@ public class Message implements Serializable {
           // Increment clock
           DistroCal.getInstance().getTimeMatrix().incrementClock();
           
+          // Remove events from partial log we already know about
+          // Must happen before time matrix is updated
+          m.partialLog.trim();
+          
+          // Integreate receieved log into our own log
+          DistroCal.getInstance().integrateReceivedLog (m.partialLog);
+          
+          // Process events in log into calendar dictionary
+          
+                    
           // Update TimeMatrix based on received time table
           DistroCal.getInstance().getTimeMatrix().updateWithMatrix(m.timeMatrix);
+                    
+          System.out.println("Message handled.");
           }
     }

@@ -95,6 +95,29 @@ public class DistroCal {
     }
     
     /*
+    Add events from a received log into our own log
+    At this point the log will already have been trimmed to only included
+    events which are not already in the node's log
+    This is for Hunter to tackle
+    */
+    public void integrateReceivedLog(Log l) {
+        // This is the log for this node
+        Log myLog = partialLog;
+    }
+    
+    /*
+    Process events from partial log into calendar
+    Does not protect from duplicates--log must be trimmed!
+    */
+    public void processLogIntoCalendar(Log l) {
+        for (Event e : l.getEvents()) {
+            switch (e.getType()) {
+                
+            }
+        }
+    }
+    
+    /*
     Imitate node failure
     */
     public static void crash() {

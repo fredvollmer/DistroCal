@@ -15,6 +15,14 @@ public class Message implements Serializable {
 
     private Log partialLog;
     private TimeMatrix timeMatrix;
+    
+    /*
+    Constructor
+    */
+    public Message (Log l, TimeMatrix t) {
+        partialLog = l;
+        timeMatrix = t;
+    }
 
     public static void handleReceivedMessage(Message m) {
           // Do nothing if this node is "crashed"

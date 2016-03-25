@@ -16,6 +16,21 @@ public class Event implements Serializable {
     private EventType type;
     private Node node;
     private int time;
+    private CalendarEvent calendarEvent;
+    
+    public Event (EventType t, CalendarEvent c) {
+        type = t;
+        node = DistroCal.getInstance().getThisNode();
+        time = DistroCal.getInstance().getTimeMatrix().getLogicalClock();
+        calendarEvent = c;
+    }
+    
+     public Event (EventType t, CalendarEvent c, Node n, int clock) {
+        type = t;
+        node = n;
+        time = clock;
+        calendarEvent = c;
+    }
 
     public Node getNode() {
         return node;
@@ -27,5 +42,9 @@ public class Event implements Serializable {
     
     public EventType getType () {
         return type;
+    }
+    
+    public CalendarEvent getCalendarEvent () {
+        return calendarEvent;
     }
 }

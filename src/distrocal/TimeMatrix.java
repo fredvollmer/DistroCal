@@ -37,6 +37,11 @@ public class TimeMatrix implements Serializable {
         table.get(row.getAddress()).put(col.getAddress(), t);
     }
     
+    public int getLogicalClock () {
+        Node me = DistroCal.getInstance().getThisNode();
+        return get(me, me);
+    }
+    
     /*
     Increment this node's logical clock
     */

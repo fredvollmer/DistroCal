@@ -6,9 +6,11 @@
 
 package distrocal;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -16,15 +18,44 @@ import java.util.Set;
  * @author s65q479
  */
 public class Log implements Serializable {
-    private Set<Event> events;          // Set of events
+    private List<Event> events;          // Set of events
     private int lastUpdate = -1;        // Time 
     
     public Log () {
-        events = new HashSet<>();
+        events = new ArrayList<>();
     }
     
+    /*
+    Inserts an event into the log, but does no broadcasting
+    */
     public void add (Event e) {
         events.add(e);
+    }
+    
+    /*
+    Inserts a new event into log and broadcasts to other nodes
+    Assumes this event is being created at THIS node
+    */
+    public void createEvent (Event e) {
+        // Increment clock
+        DistroCal.getInstance().getTimeMatrix().incrementClock();
+        
+        // Add event record
+        events.add(e);
+        
+        // Send message to every other node
+        for (Node n : DistroCal.getInstance().getOtherNodes()) {
+            // Build customized partial log
+            Log l = n.createPartialLog();
+            // Create message
+            Message m = new Message(l, DistroCal.getInstance().getTimeMatrix());
+            // Send message
+            try {
+                n.send(m);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
     
     /*
@@ -45,7 +76,7 @@ public class Log implements Serializable {
         }
     }
     
-    public Set<Event> getEvents () {
+    public List<Event> getEvents () {
         return events;
     }
 }

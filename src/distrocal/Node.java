@@ -60,6 +60,20 @@ public class Node implements Serializable {
             e.printStackTrace();
         }
     }
+    
+       /*
+     Check if this node is available over a time range
+     Start time is inclusive, end is exclusive
+     */
+    public boolean isAvailable(int day, int start, int end) {
+        // Iterate over each time slot, checking if key exists
+        for (; start < end; start++) {
+            if (DistroCal.getInstance().getCalendarEvents().containsKey(day + "-" + start + "-" + getAddress())) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /*
      Predicate to determine if this Node has knowledge of an Event

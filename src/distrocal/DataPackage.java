@@ -5,6 +5,7 @@
  */
 package distrocal;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -13,10 +14,10 @@ import java.util.Set;
  * @author s65q479
  */
 public class DataPackage {
-    public Set<CalendarEvent> events;
+    public List<CalendarEvent> events;
     public int status;
     
-    public Set<CalendarEvent> getEvents () {
+    public List<CalendarEvent> getEvents () {
         return events;
     }
     

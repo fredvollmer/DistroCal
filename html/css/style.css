@@ -1,0 +1,11 @@
+html, body {
+	margin: 0;
+}
+
+.gridCell {
+	float: left;
+	width: 50vw;
+	height: 50vh;
+	box-sizing: border-box;
+	border: 1px solid gray;
+}

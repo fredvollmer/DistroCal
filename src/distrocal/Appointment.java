@@ -6,7 +6,6 @@
 package distrocal;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -15,7 +14,7 @@ import java.util.UUID;
  *
  * @author fredvollmer
  */
-public class CalendarEvent implements Serializable {
+public class Appointment implements Serializable {
     private String name;                // Name of the event
     private int day;                    // Integer representation of day of week.
                                         // (Sunday = 0; Saturday = 6)
@@ -26,9 +25,9 @@ public class CalendarEvent implements Serializable {
     private String creator;
     private Set<String> participatingNodes;          // Set of node IP addresses
     private Set<String> unconfirmedNodes;            // Awaiting RSVP
-    private int status = 1;             // Set to 0 if pending RSVP's
+    private int pending;             // Set to 0 if pending RSVP's
     
-    public CalendarEvent(String _name, int _day, int _s, int _e, String _creator, Set<String> _nodes) {
+    public Appointment(String _name, int _day, int _s, int _e, String _creator, Set<String> _nodes) {
         this.name = _name;
         this.day = _day;
         this.startTime = _s;
@@ -40,7 +39,7 @@ public class CalendarEvent implements Serializable {
         this.unconfirmedNodes.addAll(_nodes);
     }
     
-    public CalendarEvent () {
+    public Appointment () {
         // Blank constructor
     }
     
@@ -48,8 +47,8 @@ public class CalendarEvent implements Serializable {
     Create a clone of this appointment.
     Participating nodes altered to reflect other nodes
     */
-    public CalendarEvent createCopyOfGroupApptForThisNode () {
-        CalendarEvent clone = new CalendarEvent();
+    public Appointment createCopyOfGroupApptForThisNode () {
+        Appointment clone = new Appointment();
         clone.name = this.name;
         clone.day = this.day;
         clone.startTime = this.startTime;
@@ -70,6 +69,10 @@ public class CalendarEvent implements Serializable {
         clone.unconfirmedNodes = un;
         
         return clone;
+    }
+    
+    public void confirmNode (Node n) {
+        unconfirmedNodes.remove(n.getAddress());
     }
     
     public String getName() {
@@ -96,7 +99,7 @@ public class CalendarEvent implements Serializable {
         return creator;
     }
     
-    public int getStatus() {
-        return status;
+    public boolean getPending () {
+        return (unconfirmedNodes.size() > 0);
     }
 }

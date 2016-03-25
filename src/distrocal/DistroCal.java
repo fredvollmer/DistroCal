@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.*;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +37,7 @@ public class DistroCal {
     private Set<Node> otherNodes;
     private Log partialLog;
     // Map [day+hour+address] to event
-    private Map<String, CalendarEvent> calendar;
+    private Map<String, Appointment> calendar;
     private Node thisNode;
     private TimeMatrix timeMatrix;
 
@@ -45,6 +47,7 @@ public class DistroCal {
      */
     public DistroCal(String[] IPs, String thisIP) throws IOException {
         otherNodes = new HashSet<>();
+        calendar = new HashMap<>();
 
         // Create "this" node
         thisNode = new Node(thisIP);
@@ -73,6 +76,15 @@ public class DistroCal {
         server.start();
 
         System.out.println("DistroCal node started...");
+        
+        // Test appt
+        Set<String> testNodes = new HashSet<>();
+        for (Node n : otherNodes) {
+            testNodes.add(n.getAddress());
+        }
+        Appointment a = new Appointment("Test appointment", 1, 3, 7, thisNode.getAddress(), testNodes);
+        String key = a.getDay() + "-" + a.getStartTime() + thisNode.getAddress();
+        calendar.put(key, a);
     }
 
     /**
@@ -113,18 +125,20 @@ public class DistroCal {
      */
     public void processLogIntoCalendar(Log l) {
         for (Event e : l.getEvents()) {
+            Appointment ce = e.getCalendarEvent();
+            String key = "";
+            
             switch (e.getType()) {
                 case INSERT:
-                    CalendarEvent ce = e.getCalendarEvent();
-
+                    
                     // Check if this node is part of appointment
                     if (ce.getNodes().contains(instance.thisNode.getAddress())) {
                         // Check if this node is free
                         if (instance.thisNode.isAvailable(ce.getDay(), ce.getStartTime(), ce.getEndTime())) {
 
                             // Create new appointment and add to calendar
-                            CalendarEvent ne = ce.createCopyOfGroupApptForThisNode();
-                            String key = ce.getDay() + "-" + ce.getStartTime() + instance.thisNode.getAddress();
+                            Appointment ne = ce.createCopyOfGroupApptForThisNode();
+                            key = ce.getDay() + "-" + ce.getStartTime() + instance.thisNode.getAddress();
                             calendar.put(key, ne);
 
                             // Create RSVP event and add to log
@@ -138,16 +152,36 @@ public class DistroCal {
                         }
                     } else {
                         // This event has nothing to do with this node
-                        String key = ce.getDay() + "-" + ce.getStartTime() + "-" + ce.getCreator();
+                        key = ce.getDay() + "-" + ce.getStartTime() + "-" + ce.getCreator();
                         calendar.put(key, ce);
                     }
 
                     break;
 
                 case DELETE:
+                    // Check if this event included this node, delete clone if so
+                    if (ce.getNodes().contains(instance.thisNode.getAddress())) {
+                        // Delete this node's clone of this appointment
+                        key = ce.getDay() + "-" + ce.getStartTime() + instance.thisNode.getAddress();
+                        calendar.remove(key);
+                    }
+                    
+                    // Delete event from calendar
+                    key = ce.getDay() + "-" + ce.getStartTime() + "-" + ce.getCreator();
+                    calendar.remove(key);
                     
                     break;
-
+                    
+                case RSVP:
+                    // Remove sending node from unconfirmed set for this appoointment
+                    // Find this node's clone of group appointment
+                    key = ce.getDay() + "-" + ce.getStartTime() + instance.thisNode.getAddress();
+                    Appointment a = calendar.get(key);
+                    if (a == null) {
+                        System.err.println("Error in RSVP: appointment clone not found");
+                        return;
+                    }
+                    a.confirmNode(e.getNode());
             }
         }
     }
@@ -182,7 +216,12 @@ public class DistroCal {
         return thisNode;
     }
 
-    public Map<String, CalendarEvent> getCalendarEvents() {
+    public Map<String, Appointment> getAppointments() {
         return calendar;
+    }
+    
+    public Set<Appointment>  getAppointmentsAsSet () {
+        Set<Appointment> c = new HashSet(calendar.values());
+        return c;
     }
 }

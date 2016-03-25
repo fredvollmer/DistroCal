@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package distrocal;
 
 import java.io.IOException;
@@ -18,33 +17,37 @@ import java.util.Set;
  * @author s65q479
  */
 public class Log implements Serializable {
+
     private List<Event> events;          // Set of events
     private int lastUpdate = -1;        // Time 
-    
-    public Log () {
+
+    public Log() {
         events = new ArrayList<>();
     }
-    
+
     /*
-    Inserts an event into the log, but does no broadcasting
-    */
-    public void add (Event e) {
+     Inserts an event into the log, but does no broadcasting
+     */
+    public void add(Event e) {
         events.add(e);
     }
-    
+
     /*
-    Inserts a new event into log and broadcasts to other nodes
-    Assumes this event is being created at THIS node
-    */
-    public void createEvent (Event e) {
+     Inserts a new event into log and broadcasts to other nodes
+     Assumes this event is being created at THIS node
+     */
+    public void createEvent(Event e) {
         // Increment clock
         DistroCal.getInstance().getTimeMatrix().incrementClock();
-        
+
         // Add event record
         events.add(e);
-        
+
         // Send message to every other node
         for (Node n : DistroCal.getInstance().getOtherNodes()) {
+            // Increment clock
+            DistroCal.getInstance().getTimeMatrix().incrementClock();
+
             // Build customized partial log
             Log l = n.createPartialLog();
             // Create message
@@ -57,11 +60,11 @@ public class Log implements Serializable {
             }
         }
     }
-    
+
     /*
-    Removes events from a log which we already know about, based on time matrix
-    */
-    public void trim () {
+     Removes events from a log which we already know about, based on time matrix
+     */
+    public void trim() {
         TimeMatrix m = DistroCal.getInstance().getTimeMatrix();
         Node thisNode = DistroCal.getInstance().getThisNode();
         // For each event in partial log, check if we already know about it
@@ -75,8 +78,8 @@ public class Log implements Serializable {
             }
         }
     }
-    
-    public List<Event> getEvents () {
+
+    public List<Event> getEvents() {
         return events;
     }
 }

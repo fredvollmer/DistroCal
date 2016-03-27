@@ -40,8 +40,11 @@ public class Log implements Serializable {
         // Increment clock
         DistroCal.getInstance().getTimeMatrix().incrementClock();
 
+        // Set event time to incremented clock
+        e.setTime(DistroCal.getInstance().getTimeMatrix().getLogicalClock());
+        
         // Add event record
-        events.add(e);
+        events.add(e);       
 
         // Send message to every other node
         for (Node n : DistroCal.getInstance().getOtherNodes()) {

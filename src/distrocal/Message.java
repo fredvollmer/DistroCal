@@ -39,7 +39,7 @@ public class Message implements Serializable {
           DistroCal.getInstance().integrateReceivedLog (m.partialLog);
           
           // Process events in log into calendar dictionary
-          
+          DistroCal.getInstance().processLogIntoCalendar(m.partialLog);
                     
           // Update TimeMatrix based on received time table
           DistroCal.getInstance().getTimeMatrix().updateWithMatrix(m.timeMatrix);

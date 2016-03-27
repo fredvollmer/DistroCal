@@ -37,8 +37,16 @@ public class Node implements Serializable {
     Create a partial log to send to this node
     */
     public Log createPartialLog () {
-        
-        return new Log();
+        // Iterate over every event in this instances log
+        Log thisLog = DistroCal.getInstance().getLog();
+        Log pl = new Log();
+        for (Event e : thisLog.getEvents()) {
+            // check if this event needs to be included
+            if (!hasRec(e)) {
+                pl.add(e);
+            }
+        }
+        return pl;
     }
 
     /*
@@ -55,6 +63,8 @@ public class Node implements Serializable {
             this.outStream = new ObjectOutputStream(ds);
 
             outStream.writeObject(m);
+            
+            this.socket.close();
             
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,7 +88,8 @@ public class Node implements Serializable {
     /*
      Predicate to determine if this Node has knowledge of an Event
      */
-    public boolean hasRec(Event e, TimeMatrix t) {
+    public boolean hasRec(Event e) {
+        TimeMatrix t = DistroCal.getInstance().getTimeMatrix();
         return t.get(this, e.getNode()) >= e.getTime();
     }
     

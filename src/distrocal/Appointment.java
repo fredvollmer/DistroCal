@@ -43,6 +43,8 @@ public class Appointment implements Serializable {
     
     public Appointment () {
         // Blank constructor
+        this.participatingNodes = new HashSet<> ();
+        this.unconfirmedNodes = new HashSet<> ();
     }
     
     /*
@@ -62,13 +64,13 @@ public class Appointment implements Serializable {
         pn.remove(DistroCal.getInstance().getThisNode().getAddress());
         pn.add(this.creator);
         
-        clone.participatingNodes = pn;
+        clone.participatingNodes = new HashSet<>(pn);
         
         Set<String> un = new HashSet<>();
         un.addAll(this.unconfirmedNodes);
         un.remove(DistroCal.getInstance().getThisNode().getAddress());
         
-        clone.unconfirmedNodes = un;
+        clone.unconfirmedNodes = new HashSet<>(un);
         
         return clone;
     }
@@ -81,24 +83,49 @@ public class Appointment implements Serializable {
         return name;
     }
     
+    public void setName(String _name) {
+        name = _name;
+    }
+    
     public int getDay() {
         return day;
+    }
+    
+    public void setDay (int _d) {
+        day = _d;
     }
     
     public int getStartTime() {
         return startTime;
     }
     
+    public void setStartTime (int _s) {
+        startTime = _s;
+    }
+    
     public int getEndTime() {
         return endTime;
+    }
+    
+    public void setEndTime(int _e) {
+        endTime = _e;
     }
     
     public Set<String> getNodes() {
         return participatingNodes;
     }
     
+    public void setNodes (Set<String> n) {
+        participatingNodes = new HashSet<>(n);
+        unconfirmedNodes = new HashSet<>(n);
+    }
+    
     public String getCreator() {
         return creator;
+    }
+    
+    public void setCreator (String c) {
+        creator = c;
     }
     
     public boolean getPending () {

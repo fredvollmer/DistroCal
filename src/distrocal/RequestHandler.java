@@ -28,14 +28,23 @@ public class RequestHandler implements HttpHandler {
         InputStream is = t.getRequestBody();
         read(is); // .. read the request body
         String response = "";
+        String origin = "";
+        int statusCode = 200;
         Headers requestHeaders = t.getRequestHeaders();
         Headers responseHeaders = t.getResponseHeaders();
 
+        // Set origin to be allowed
+        List<String> origins = requestHeaders.get("Origin");
+        if (origins != null) {
+            origin = origins.get(0);
+            responseHeaders.set("Access-Control-Allow-Origin", origin);
+        }
+        
         switch (t.getRequestMethod()) {
             case "GET":
                 // Create Jackson instance
                 ObjectMapper jsonMapper = new ObjectMapper();
-                
+
                 // Set content-type header to JSON
                 responseHeaders.set("Content-Type", "application/JSON");
 
@@ -55,33 +64,33 @@ public class RequestHandler implements HttpHandler {
                 break;
             case "POST":
                 // Create new event
+                
+                statusCode = 201;
                 break;
             case "DELETE":
                 break;
-                
+
             case "LOCK":
                 DistroCal.crash();
                 System.out.println("This node has CRASHED");
                 break;
-                
+
             case "UNLOCK":
                 DistroCal.recover();
                 System.out.println("This node has RECOVERED");
                 break;
-                     
+
             case "OPTIONS":
                 // Handle CORS preflight
-                String origin = requestHeaders.get("Origin").get(0);
-
-                // Send headers
-                responseHeaders.set("Access-Control-Allow-Origin", origin);
                 responseHeaders.add("Access-Control-Allow-Methods", "POST");
                 responseHeaders.add("Access-Control-Allow-Methods", "GET");
                 responseHeaders.add("Access-Control-Allow-Methods", "DELETE");
-
+                responseHeaders.add("Access-Control-Allow-Methods", "LOCK");
+                responseHeaders.add("Access-Control-Allow-Methods", "UNLOCK");
+                responseHeaders.add("Access-Control-Allow-Headers", "Content-Type");
         }
 
-        t.sendResponseHeaders(200, response.length());
+        t.sendResponseHeaders(statusCode, response.length());
         OutputStream os = t.getResponseBody();
         os.write(response.getBytes());
         os.close();

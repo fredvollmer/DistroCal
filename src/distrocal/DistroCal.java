@@ -82,9 +82,13 @@ public class DistroCal {
         for (Node n : otherNodes) {
             testNodes.add(n.getAddress());
         }
-        Appointment a = new Appointment("Test appointment", 1, 3, 7, thisNode.getAddress(), testNodes);
+        Appointment a = new Appointment("Test appt", 1, 2, 10, thisNode.getAddress(), testNodes);
         String key = a.getDay() + "-" + a.getStartTime() + thisNode.getAddress();
         calendar.put(key, a);
+        
+        Appointment b = new Appointment("Test two", 5, 24, 40, thisNode.getAddress(), null);
+        String key1 = b.getDay() + "-" + b.getStartTime() + thisNode.getAddress();
+        calendar.put(key1, b);
     }
 
     /**

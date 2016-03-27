@@ -34,9 +34,11 @@ public class Appointment implements Serializable {
         this.endTime = _e;
         this.creator = _creator;
         this.participatingNodes = new HashSet<> ();
-        this.participatingNodes.addAll(_nodes);
         this.unconfirmedNodes = new HashSet<> ();
-        this.unconfirmedNodes.addAll(_nodes);
+        if (_nodes != null) {
+            this.participatingNodes.addAll(_nodes);         
+            this.unconfirmedNodes.addAll(_nodes);
+        }
     }
     
     public Appointment () {

@@ -1,27 +1,65 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<script src="scripts/jquery-2-2.js"></script>
-		<link rel="stylesheet" type="text/css" href="css/style.css" />
-	</head>
-	
-	<body>
-		<!-- Four cell grid -->
-		<div class="gridCell" id="0">
-		
-		</div>
-		
-		<div class="gridCell" id="1">
-		
-		</div>
-		
-		<div class="gridCell" id="2">
-		
-		</div>
-		
-		<div class="gridCell" id="3">
-		
-		</div>
+<head>
+    <script src="scripts/jquery-2-2.js"></script>
+    <script src="scripts/main.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+</head>
 
-	</body>
+<body>
+<!-- Four cell grid -->
+<div class="gridCell" id="_0">
+    <div class="loader">
+        <i class="fa fa-cog fa-spin"></i>
+    </div>
+    <div class="cellTitle" id="title_0">
+        <i class="fa fa-stop-circle"></i>
+    </div>
+    <table class="calendarTable" id="table_0"></table>
+</div>
+
+<div class="gridCell" id="_1">
+    <div class="loader">
+        <i class="fa fa-cog fa-spin"></i>
+    </div>
+    <div class="cellTitle" id="title_1">
+        <i class="fa fa-stop-circle"></i>
+    </div>
+    <table class="calendarTable" id="table_1"></table>
+</div>
+
+<div class="gridCell" id="_2">
+    <div class="loader">
+        <i class="fa fa-cog fa-spin"></i>
+    </div>
+    <div class="cellTitle" id="title_2">
+        <i class="fa fa-stop-circle"></i>
+    </div>
+    <table class="calendarTable" id="table_2"></table>
+</div>
+
+<div class="gridCell" id="_3">
+    <div class="loader">
+        <i class="fa fa-cog fa-spin"></i>
+    </div>
+    <div class="cellTitle" id="title_3">
+        <i class="fa fa-stop-circle"></i>
+    </div>
+    <table class="calendarTable" id="table_3"></table>
+</div>
+
+<!-- new event -->
+<div class = "eventModal">
+    <span class="modal-title">Create event</span>
+    <input type="text" id="eventName" placeholder="Event name" />
+    <input type="text" id="eventLength" placeholder="Event length (hours)" />
+    <div class="nodeSelector"></div>
+    <div class="modalButtons">
+        <div class="modalButton" id="submit">Create</div>
+        <div class="modalButton" id="cancel">Cancel</div>
+    </div>
+</div>
+
+</body>
 </html>

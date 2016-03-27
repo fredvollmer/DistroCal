@@ -39,7 +39,7 @@ html, body {
     height: 50px;
     width: 100%;
     font-size: 1.5em;
-    background-color: #e16b66;
+    background-color: #afafaf;
     color: #e6e6e6;
     text-align: center;
     vertical-align: middle;
@@ -76,7 +76,7 @@ td {
     text-align: center;
 }
 
-.fa-stop-circle {
+.nodeControl {
     display: none !important;
     opacity: 0;
     cursor: pointer;
@@ -87,11 +87,16 @@ td {
     transform: translate(0, -50%);
 }
 
-.fa-stop-circle:hover {
+.active {
+    opacity: 1.0;
+    display: block !important;
+}
+
+.nodeControl:hover {
     color: white;
 }
 
-.cellTitle:hover .fa-stop-circle {
+.cellTitle:hover .nodeControl {
     display: block !important;
     opacity: 1.0;
 }
@@ -119,7 +124,7 @@ td {
     transition: 0.5s;
 }
 
-.fa-cog {
+.loaderIcon {
     position: absolute;
     display: inline-block;
     top: 40%;

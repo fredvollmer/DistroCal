@@ -39,35 +39,115 @@ $(document).ready(function () {
         });
     });
 
+    // Delete click
+    $("body").on("click", ".event", function (e) {
+
+    });
+
     // Crash click
-    
+    $(".nodeControl").click(function(e) {
+        $(this).removeClass("fa-stop-circle");
+        $(this).removeClass("fa-play-circle");
+        $(this).addClass("fa-cog");
+        $(this).addClass("fa-spin");
+        $(this).addClass("active");
+        var node = nodes[$(this).parent().attr('id').charAt($(this).parent().attr('id').length - 1)];
+        node.crashNode();
+        if (node.active) {
+            $(this).addClass("fa-stop-circle");
+        } else {
+            $(this).addClass("fa-play-circle");
+        }
+        $(this).removeClass("fa-cog");
+        $(this).removeClass("fa-spin");
+        $(this).removeClass("active");
+    });
 
     // Event creation clicks on table
     $(".calendarTable").click(function(e) {
         if (modalActive) return;
-        // Get node
-        var nodeIndex = $(this).attr('id').charAt($(this).attr('id').length - 1);
 
-        // Get x and y in %
-        var x = ((e.pageX - $(this).offset().left) / $(this).width()) * 100;
-        var y = ((e.pageY - $(this).offset().top) / $(this).height()) * 100;
+        if ($(e.target).is(".event") || $(e.target).parent().is(".event")) {
+            // Delete event
+            if (!confirm("Are you sure you want to delete this event?")) return;
+            var node = nodes[$(e.target).attr('node')];
+            var event = {};
+            event.key = $(e.target).attr('id');
+            node.deleteEvent(event);
+        } else {
+            // Get node
+            var nodeIndex = $(this).attr('id').charAt($(this).attr('id').length - 1);
 
-        // Get day and start
-        var day = Math.floor(x / 14.28);
-        var start = Math.floor(y / 2);
+            // Get x and y in %
+            var x = ((e.pageX - $(this).offset().left) / $(this).width()) * 100;
+            var y = ((e.pageY - $(this).offset().top) / $(this).height()) * 100;
 
-        showNewEventDialogue(nodes[nodeIndex], day, start);
+            // Get day and start
+            var day = Math.floor(x / 14.28);
+            var start = Math.floor(y / 2);
 
+            showNewEventDialogue(nodes[nodeIndex], day, start);
+        }
     });
 
 });
 
 function Node (address, uid, cell, color) {
-    this.initialized = false;
+    this.active = true;
     this.events = [];
     this.uid = uid;
     this.address = address;
     this.color = color;
+
+    this.deleteEvent = function (event) {
+        $.ajax({
+            method: "DELETE",
+            url: "http://" + this.address,
+            context: this,
+            cache: false,
+            data: JSON.stringify(event),
+            async: true,
+            error: function (e) {
+                alert("An error occurred with deleting event.");
+            },
+            statusCode: {
+                200: function (data) {
+                },
+                500: function (e) {
+                    alert("An unknown server error just done happened.");
+                }
+            },
+            complete: function () {
+            }
+        });
+    };
+
+    this.crashNode = function () {
+        var method = (this.active) ? "LOCK" : "UNLOCK";
+        $.ajax({
+            method: method,
+            url: "http://" + this.address,
+            context: this,
+            cache: false,
+            contentType: "application/json",
+            async: false,
+            error: function (e) {
+                alert("An error occurred with crashing node");
+            },
+            statusCode: {
+                200: function (data) {
+                    this.active = !this.active;
+                    var color = (this.active) ? "#61ae6e" : "#e16b66";
+                    $("#_" + cell + " .cellTitle").css("background-color", color);
+                },
+                500: function (e) {
+                    alert("An unknown server error just done happened.");
+                }
+            },
+            complete: function () {
+            }
+        });
+    };
 
     this.fetchAppointments = function (initial) {
         $.ajax({
@@ -113,7 +193,8 @@ function Node (address, uid, cell, color) {
         // Build event block HTML
         var html = "<div class='event' style='background-color: " + bg + "; "
                 + "top: " + y + "%; " + "left: " + x + "%; " + "height: " + height + "%;' "
-            + "id='event_" + event.day + "-" + event.startTime + "-" + this.uid + "'>"
+            + "id='" + event.day + "-" + event.startTime + "-" + this.uid
+            + "' node='" + cell + "'>"
             + "<span class='event-title'>" + event.name + "</span>"
             + "<span class='event-nodes'>";
 
@@ -173,10 +254,9 @@ function postEvent (event, node) {
         url: "http://" + node.address,
         context: this,
         cache: false,
-        dataType: "json",
         data: JSON.stringify(event),
         contentType: "application/json",
-        synchronous: true,
+        async: false,
         error: function (e) {
             alert("An error occurred with creating new event.");
         },
@@ -227,6 +307,7 @@ function showNewEventDialogue (node, day, start) {
         modal.animate({
             "opacity": 0
         }, 400, function () {
+            $(this).find("#submit").html('Create');
             modal.css("display", "none");
             modalActive = false;
         });

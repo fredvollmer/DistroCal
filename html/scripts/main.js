@@ -71,8 +71,14 @@ $(document).ready(function () {
             // Delete event
             if (!confirm("Are you sure you want to delete this event?")) return;
             var node = nodes[$(e.target).attr('node')];
+            if (!node) {
+                node = nodes[$(e.target).parent().attr('node')];
+            }
             var event = {};
             event.key = $(e.target).attr('id');
+            if (!event.key) {
+                event.key = $(e.target).parent().attr('id');
+            }
             node.deleteEvent(event);
         } else {
             // Get node
@@ -89,7 +95,6 @@ $(document).ready(function () {
             showNewEventDialogue(nodes[nodeIndex], day, start);
         }
     });
-
 });
 
 function Node (address, uid, cell, color) {
@@ -105,6 +110,7 @@ function Node (address, uid, cell, color) {
             url: "http://" + this.address,
             context: this,
             cache: false,
+            contentType: "application/json",
             data: JSON.stringify(event),
             async: true,
             error: function (e) {
@@ -112,6 +118,7 @@ function Node (address, uid, cell, color) {
             },
             statusCode: {
                 200: function (data) {
+                    this.fetchAppointments();
                 },
                 500: function (e) {
                     alert("An unknown server error just done happened.");
@@ -246,6 +253,13 @@ function Node (address, uid, cell, color) {
     // Initial GET
     this.fetchAppointments(true);
 
+    // Create repeating fetch event for this node
+    var n = this;
+    window.setInterval(function () {
+        n.fetchAppointments();
+        console.log("Fetch for node");
+    }, 4000);
+
 };
 
 function postEvent (event, node) {
@@ -278,6 +292,7 @@ function postEvent (event, node) {
 
 function showNewEventDialogue (node, day, start) {
     modalActive = true;
+    var dayNum = day;
     var modal = $(".eventModal");
     var time = days[day] + " @ " + ("00" + Math.floor(start / 2)).slice(-2) + ":" + ("00" + ((start % 2) * 30)).slice(-2);
     modal.find(".modal-title").html(time);
@@ -294,12 +309,13 @@ function showNewEventDialogue (node, day, start) {
     $("#submit").click (function () {
         $(this).html('<i class="fa fa-cog fa-spin"></i>');
         var event = {};
-        event.name = $("#eventName").value;
+        event.name = $("#eventName").val();
+        event.day = dayNum;
         event.startTime = start;
-        event.endTime = (start + (2 * $("#eventLength").value));
+        event.endTime = (start + (2 * $("#eventLength").val()));
         event.nodes = [];
         $(".nodeSelector input:checked").each (function (index, box) {
-            event.nodes.push($(box).value);
+            event.nodes.push($(box).val());
         });
 
         postEvent(event, node);

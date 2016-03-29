@@ -49,7 +49,8 @@ public class RequestHandler implements HttpHandler {
 
                 // Return data package: events and instance status
                 DataPackage p = new DataPackage();
-                p.events = DistroCal.getInstance().getMyAppointmentsAsSet();
+                Node thisNode = DistroCal.getInstance().getThisNode();
+                p.events = DistroCal.getInstance().getAppointmentsAsSetForNode(thisNode);
                 p.status = (DistroCal.getInstance().isCrashed) ? 0 : 1;
                 try {
                     response = jsonMapper.writeValueAsString(p);

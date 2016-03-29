@@ -238,11 +238,11 @@ public class DistroCal {
         return calendar;
     }
     
-    public Set<Appointment>  getMyAppointmentsAsSet () {
+    public Set<Appointment>  getAppointmentsAsSetForNode (Node n) {
         Set<Appointment> c = new HashSet(calendar.values());
         Iterator<Appointment> it = c.iterator();
         for (; it.hasNext();) {
-            if (!it.next().getCreator().equals(getThisNode().getAddress())) {
+            if (!it.next().getCreator().equals(n.getAddress())) {
                 it.remove();
             }
         }

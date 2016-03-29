@@ -61,7 +61,7 @@ html, body {
     cursor: pointer;
 }
 
-tr:nth-child(odd) {
+tr {
     border-collapse: collapse;
     border-bottom: 1px solid #e1e1e1;
 }
@@ -72,8 +72,12 @@ td {
     border-right: 1px solid gray;
     height: 2%;
     font-size: 0.5em;
-    width: 14.28%;
+    width: 13%;
     text-align: center;
+}
+
+td:first-child {
+    width: 9%;
 }
 
 .nodeControl {
@@ -139,7 +143,7 @@ td {
     position: absolute;
     color: whitesmoke;
     z-index: 999;
-    width: 14.28%;
+    width: 13%;
     overflow: hidden;
 }
 

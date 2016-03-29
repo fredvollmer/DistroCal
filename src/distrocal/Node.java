@@ -26,6 +26,7 @@ public class Node implements Serializable {
      Constructor
      */
     public Node(String _address) {
+        System.out.println(_address);
 
         String addressParts[] = _address.split(":");
         this.ip = addressParts[0];
@@ -76,9 +77,16 @@ public class Node implements Serializable {
      Start time is inclusive, end is exclusive
      */
     public boolean isAvailable(int day, int start, int end) {
-        // Iterate over each time slot, checking if key exists
-        for (; start < end; start++) {
-            if (DistroCal.getInstance().getAppointments().containsKey(day + "-" + start + "-" + getAddress())) {
+        // Iterate over all events on this day
+        // See if (start1 > start2 AND start1 < end2)
+        // OR (end1 < end2 AND end1 > start2)
+        for (Appointment a : DistroCal.getInstance().getAppointmentsAsSetForNode(this)) {
+            if (a.getDay() != day) continue;
+            
+            if ((start >= a.getStartTime() && start < a.getEndTime())
+                    || (end <= a.getEndTime() && end >= a.getStartTime())
+                    || (a.getStartTime() >= start && a.getStartTime() < end)
+                    || (a.getEndTime() > start && a.getEndTime() <= end )) {
                 return false;
             }
         }

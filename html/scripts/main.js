@@ -9,23 +9,37 @@ $(document).ready(function () {
     // for each table
     $(tables).each(function (index, table) {
         // Add row for each half hour
-        for (var i = 0; i < 47; i++) {
+        for (var i = 0; i < 25; i++) {
             var row = table.insertRow(i);
 
-            // Insert 7 cells
-            for (var j = 0; j < 7; j++) {
+            // Insert 8 cells
+            for (var j = 0; j < 8; j++) {
                 var cell = row.insertCell(j);
-                if (i == 0) {
-                    cell.innerHTML = days[j];
+                if (i == 0 && j > 0) {
+                    cell.innerHTML = days[j - 1];
+                }
+
+                if (j == 0 && i > 0) {
+                    cell.innerHTML = ("00" + Math.floor((i - 1) * 2/ 2)).slice(-2) + ":" + ("00" + ((((i - 1) * 2) % 2) * 30)).slice(-2);
                 }
             }
         }
     });
 
-    // Create nodes
-    nodes = [
+
+    // Create nodes: TESTING
+    /*nodes = [
         new Node("127.0.0.1:8000", "127.0.0.1:1024", 0, "#e13d67"),
         new Node("127.0.0.1:8001", "127.0.0.1:1025", 1, "#3bace1")
+    ];*/
+
+
+    // Create nodes: PRODUCTION
+    nodes = [
+        new Node("52.36.132.235:8000", "52.36.132.235:1024", 0, "#e13d67"),
+        new Node("52.33.216.246:8000", "52.33.216.246:1024", 1, "#3bace1"),
+        new Node("52.26.241.9:8000", "52.26.241.9:1024", 2, "#e1c826"),
+        new Node("52.10.235.232:8000", "52.10.235.232:1024", 3, "#38e1ab")
     ];
 
     // Cancel click
@@ -89,8 +103,8 @@ $(document).ready(function () {
             var y = ((e.pageY - $(this).offset().top) / $(this).height()) * 100;
 
             // Get day and start
-            var day = Math.floor(x / 14.28);
-            var start = Math.floor(y / 2);
+            var day = Math.floor((x - 9) / 13);
+            var start = Math.floor((y - 2) / 2);
 
             showNewEventDialogue(nodes[nodeIndex], day, start);
         }
@@ -190,9 +204,9 @@ function Node (address, uid, cell, color) {
     this.placeEvent = function (event) {
         // Compute x, y and height coordinates (as %)
         // In terms of upper left corner
-        var x = event.day * 14.28;
+        var x = event.day * 13 + 9;
         var y = event.startTime * 2.0 + 2;
-        var height = (event.endTime - event.startTime) * 2.08333;
+        var height = (event.endTime - event.startTime) * 2;
 
         // Determine bg color based on pending status
         var bg = (event.pending) ? "lightgray" : this.color;
@@ -272,7 +286,6 @@ function postEvent (event, node) {
         contentType: "application/json",
         async: false,
         error: function (e) {
-            alert("An error occurred with creating new event.");
         },
         statusCode: {
             201: function (data) {
@@ -291,6 +304,8 @@ function postEvent (event, node) {
 }
 
 function showNewEventDialogue (node, day, start) {
+    if (!days[day]) return;
+
     modalActive = true;
     var dayNum = day;
     var modal = $(".eventModal");
@@ -306,7 +321,7 @@ function showNewEventDialogue (node, day, start) {
     $(modal.find(".nodeSelector")).html(nodeChecks);
 
     // Bind submit click
-    $("#submit").click (function () {
+    $("#submit").unbind("click").click (function () {
         $(this).html('<i class="fa fa-cog fa-spin"></i>');
         var event = {};
         event.name = $("#eventName").val();
